@@ -1,0 +1,15 @@
+{
+  "name": "Vue-thin",
+  "version": "1.0.0",
+  "main": "index.js",
+  "repository": "git@github.com:Hazel-Lin/Vue-thin.git",
+  "author": "linhuizi <529246402@qq.com>",
+  "license": "MIT",
+  "scripts": {
+    "test": "jest"
+  },
+  "devDependencies": {
+    "@types/jest": "^28.1.3",
+    "jest": "^27.1.0"
+  }
+}
