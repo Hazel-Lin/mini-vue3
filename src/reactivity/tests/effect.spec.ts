@@ -35,31 +35,36 @@ describe('effect', () => {
     expect(res).toBe('foo');
   });
 
-  // it("scheduler", () => {
-  //   let dummy;
-  //   let run: any;
-  //   const scheduler = jest.fn(() => {
-  //     run = runner;
-  //   });
-  //   const obj = reactive({ foo: 1 });
-  //   const runner = effect(
-  //     () => {
-  //       dummy = obj.foo;
-  //     },
-  //     { scheduler }
-  //   );
-  //   expect(scheduler).not.toHaveBeenCalled();
-  //   expect(dummy).toBe(1);
-  //   // should be called on first trigger
-  //   obj.foo++;
-  //   expect(scheduler).toHaveBeenCalledTimes(1);
-  //   // // should not run yet
-  //   expect(dummy).toBe(1);
-  //   // // manually run
-  //   run();
-  //   // // should have run
-  //   expect(dummy).toBe(2);
-  // });
+  it("scheduler", () => {
+    // effect中会传入一个scheduler
+    // scheduler 第一次不会执行 只会执行effect.run
+    // 值发生改变时 才会去执行scheduler 并且不会执行effect.run
+    // 只有当run执行时 才会执行effect.run
+    let dummy;
+    let run: any;
+    // 把effect.run 返回的结果赋值给run
+    const scheduler = jest.fn(() => {
+      run = runner;
+    });
+    const obj = reactive({ foo: 1 });
+    // effect中传入两个参数 一个函数和一个scheduler为key的对象
+    const runner = effect(
+      () => {
+        dummy = obj.foo;
+      },
+      { scheduler }
+    );
+    expect(scheduler).not.toHaveBeenCalled();
+    expect(dummy).toBe(1);
+    obj.foo++;
+    expect(scheduler).toHaveBeenCalledTimes(1);
+    // // should not run yet
+    expect(dummy).toBe(1);
+    // // manually run
+    run();
+    // // should have run
+    expect(dummy).toBe(2);
+  });
 
   // it.skip("stop", () => {
   //   let dummy;

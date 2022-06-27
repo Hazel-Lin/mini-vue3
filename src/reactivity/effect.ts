@@ -1,11 +1,10 @@
 class reactiveEffect{
   private _handle :any = null;
-  constructor(handle){
+  constructor(handle,public scheduler?){
     this._handle = handle;
   }
   run(){
     activeEffect = this
-    // 返回执行的结果
     return this._handle()
   }
 }
@@ -14,8 +13,9 @@ let activeEffect;
 const targetMap = new Map()
 
 // 副作用函数
-export function effect(handle){
-  const _effect = new reactiveEffect(handle)
+// 如何在更新的时候只执行scheduler
+export function effect(handle,options:any = {}) {
+  const _effect = new reactiveEffect(handle,options.scheduler)
   _effect.run()
   // 返回run 方法
   return _effect.run.bind(_effect)
@@ -41,8 +41,6 @@ export function track(target,key){
       depsMap = new Map()
       targetMap.set(target,depsMap)
     }
-    console.log(targetMap,'targetMap')
-
     let dep = depsMap.get(key)
     if(!dep){
       dep = new Set()
@@ -58,6 +56,11 @@ export function trigger(target,key){
   let dep = depsMap.get(key)
 
   for(const effect of dep){
-    effect.run()
+    // 通过public获取到scheduler
+    if(effect.scheduler){
+      effect.scheduler()
+    }else{
+      effect.run()
+    }
   }
 }
