@@ -85,22 +85,26 @@ describe('effect', () => {
     expect(dummy).toBe(3);
   });
 
-  // it.skip("onStop", () => {
-  //   const obj = reactive({
-  //     foo: 1,
-  //   });
-  //   const onStop = jest.fn();
-  //   let dummy;
-  //   const runner = effect(
-  //     () => {
-  //       dummy = obj.foo;
-  //     },
-  //     {
-  //       onStop,
-  //     }
-  //   );
+  it("onStop", () => {
+    // onStop函数的调用
+    const obj = reactive({
+      foo: 1,
+    });
+    const onStop = jest.fn();
+    let dummy;
+    // effect中传入两个参数 一个函数和一个onStop为key的对象
+    // 调用stop函数之后 onStop会被调用 会获取到obj.foo中的值
+    // onStop是一个函数
+    const runner = effect(
+      () => {
+        dummy = obj.foo;
+      },
+      {
+        onStop,
+      }
+    );
 
-  //   stop(runner);
-  //   expect(onStop).toBeCalledTimes(1);
-  // });
+    stop(runner);
+    expect(onStop).toBeCalledTimes(1);
+  });
 })

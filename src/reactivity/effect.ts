@@ -1,8 +1,11 @@
+import { extend } from "../shared";
+
 class reactiveEffect{
   private _handle :any = null;
   public scheduler:Function | undefined
   public depList = []
   private flag = true;
+  public onStop?: () => void
   constructor(handle,scheduler?:Function){
     this._handle = handle;
     this.scheduler = scheduler
@@ -15,6 +18,7 @@ class reactiveEffect{
   stop(){
     if(this.flag){
       cleanEffect(this)
+      this.onStop && this.onStop()
       this.flag = false
     }
   }
@@ -32,6 +36,7 @@ const targetMap = new Map()
 // 如何在更新的时候只执行scheduler
 export function effect(handle,options:any = {}) {
   const _effect = new reactiveEffect(handle,options.scheduler)
+  extend(_effect,options)
   _effect.run()
   // 返回run 方法
   const runner:any = _effect.run.bind(_effect)
