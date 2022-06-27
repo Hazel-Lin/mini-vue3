@@ -1,12 +1,28 @@
 class reactiveEffect{
   private _handle :any = null;
-  constructor(handle,public scheduler?){
+  public scheduler:Function | undefined
+  public depList = []
+  private flag = true;
+  constructor(handle,scheduler?:Function){
     this._handle = handle;
+    this.scheduler = scheduler
   }
   run(){
     activeEffect = this
     return this._handle()
   }
+  // 调用stop方法后 删除掉对应的effect
+  stop(){
+    if(this.flag){
+      cleanEffect(this)
+      this.flag = false
+    }
+  }
+}
+function cleanEffect(effect){
+  effect.depList.forEach((el:any) =>{
+    el.delete(effect);
+  })
 }
 
 let activeEffect;
@@ -18,7 +34,9 @@ export function effect(handle,options:any = {}) {
   const _effect = new reactiveEffect(handle,options.scheduler)
   _effect.run()
   // 返回run 方法
-  return _effect.run.bind(_effect)
+  const runner:any = _effect.run.bind(_effect)
+  runner.effect = _effect
+  return runner
 }
 
 /** 
@@ -46,8 +64,12 @@ export function track(target,key){
       dep = new Set()
       depsMap.set(key,dep)
     }
-
+    // 解决activeEffect可能为undefined的操作
+    if(!activeEffect) return
+    // 收集依赖
     dep.add(activeEffect)
+    // 反向收集对应的dep
+    activeEffect.depList.push(dep)
 }
 // 触发依赖
 // age更新了 
@@ -63,4 +85,8 @@ export function trigger(target,key){
       effect.run()
     }
   }
+}
+// reactive判断有没有调用stop函数
+export function stop(runner){
+  runner.effect.stop()
 }

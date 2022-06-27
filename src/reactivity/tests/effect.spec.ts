@@ -1,5 +1,5 @@
 import { reactive } from '../reactive'
-import { effect } from '../effect'
+import { effect,stop } from '../effect'
 
 describe('effect', () => { 
   it('happy path', () => {
@@ -29,7 +29,6 @@ describe('effect', () => {
       foo++;
       return 'foo';
     });
-    console.log('runner',runner);
     expect(foo).toBe(1);
     const res = runner();
     expect(res).toBe('foo');
@@ -66,23 +65,25 @@ describe('effect', () => {
     expect(dummy).toBe(2);
   });
 
-  // it.skip("stop", () => {
-  //   let dummy;
-  //   const obj = reactive({ prop: 1 });
-  //   const runner = effect(() => {
-  //     dummy = obj.prop;
-  //   });
-  //   obj.prop = 2;
-  //   expect(dummy).toBe(2);
-  //   stop(runner);
-  //   // obj.prop = 3;
-  //   obj.prop++;
-  //   expect(dummy).toBe(2);
+  it("stop", () => {
+    // effect函数还是会自执行一次
+    // 当执行了stop函数后 数据更新后也不会执行effect
+    // 手动调用runner后才会执行
+    let dummy;
+    const obj = reactive({ prop: 1 });
+    const runner = effect(() => {
+      dummy = obj.prop;
+    });
+    obj.prop = 2;
+    expect(dummy).toBe(2);
+    stop(runner);
+    obj.prop = 3;
+    expect(dummy).toBe(2);
 
-  //   // stopped effect should still be manually callable
-  //   runner();
-  //   expect(dummy).toBe(3);
-  // });
+    // stopped effect should still be manually callable
+    runner();
+    expect(dummy).toBe(3);
+  });
 
   // it.skip("onStop", () => {
   //   const obj = reactive({

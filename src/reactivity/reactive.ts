@@ -18,7 +18,6 @@ import { track,trigger } from "./effect"
 export function reactive(raw){
   return new Proxy(raw,{
     get(target,key){
-      console.log(target,key,123)
       // 获取target[key]的值
       const res = Reflect.get(target,key);
       // 还需要收集依赖
