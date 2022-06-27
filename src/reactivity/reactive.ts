@@ -14,22 +14,16 @@
  * target目标对象 key和value分别为目标对象中的键和值
  *
 */
-import { track,trigger } from "./effect"
+import { 
+  createProxy,
+  reactiveHandler,
+  readonlyHandler 
+} from "./baseHandle"
+
 export function reactive(raw){
-  return new Proxy(raw,{
-    get(target,key){
-      // 获取target[key]的值
-      const res = Reflect.get(target,key);
-      // 还需要收集依赖
-      track(target,key)
-      return res;
-    },
-    set(target,key,value){
-      // 更新target[key]的值为value
-      const res = Reflect.set(target,key,value);
-      // 触发收集的依赖
-      trigger(target,key)
-      return res;
-    }
-  })
-} 
+  return createProxy(raw,reactiveHandler)
+
+}
+export function readonly(raw){
+  return createProxy(raw,readonlyHandler)
+}
