@@ -5,7 +5,8 @@ class reactiveEffect{
   }
   run(){
     activeEffect = this
-    this._handle()
+    // 返回执行的结果
+    return this._handle()
   }
 }
 
@@ -16,6 +17,8 @@ const targetMap = new Map()
 export function effect(handle){
   const _effect = new reactiveEffect(handle)
   _effect.run()
+  // 返回run 方法
+  return _effect.run.bind(_effect)
 }
 
 /** 
@@ -38,10 +41,6 @@ export function track(target,key){
       depsMap = new Map()
       targetMap.set(target,depsMap)
     }
-    // Map(1) { { age: 10 } => Map(0) {} }
-    // Map(1) {
-    //   { age: 10 } => Map(1) { 'age' => Set(1) { [reactiveEffect] } }
-    // }
     console.log(targetMap,'targetMap')
 
     let dep = depsMap.get(key)
@@ -49,22 +48,14 @@ export function track(target,key){
       dep = new Set()
       depsMap.set(key,dep)
     }
-    // Map(1) { 'age' => Set(0) {} }
-    // Map(1) {
-    //   'age' => Set(1) { reactiveEffect { _handle: [Function (anonymous)] } }
-    // }
-    console.log(depsMap,'depsMap')
 
     dep.add(activeEffect)
-    console.log(dep,'dep1')
-
 }
 // 触发依赖
 // age更新了 
 export function trigger(target,key){
   let depsMap = targetMap.get(target)
   let dep = depsMap.get(key)
-  console.log(dep,'dep2')
 
   for(const effect of dep){
     effect.run()
