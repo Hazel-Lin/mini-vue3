@@ -1,5 +1,8 @@
 import { extend } from "../shared";
 
+let activeEffect;
+let shouldTrack = true
+const targetMap = new Map()
 class reactiveEffect{
   private _handle :any = null;
   public scheduler:Function | undefined
@@ -12,25 +15,26 @@ class reactiveEffect{
   }
   run(){
     activeEffect = this
+    shouldTrack = true
     return this._handle()
   }
   // 调用stop方法后 删除掉对应的effect
   stop(){
     if(this.flag){
-      cleanEffect(this)
+      cleanupEffect(this)
       this.onStop && this.onStop()
       this.flag = false
     }
   }
 }
-function cleanEffect(effect){
+function cleanupEffect(effect){
   effect.depList.forEach((el:any) =>{
     el.delete(effect);
   })
+  // 把 effect.deps 清空
+  effect.depList.length = 0
 }
 
-let activeEffect;
-const targetMap = new Map()
 
 // 副作用函数
 // 如何在更新的时候只执行scheduler
@@ -59,6 +63,8 @@ export function effect(handle,options:any = {}) {
  *
 */
 export function track(target,key){
+    if (!isTracking()) return;
+
     let depsMap = targetMap.get(target)
     if(!depsMap){
       depsMap = new Map()
@@ -69,12 +75,15 @@ export function track(target,key){
       dep = new Set()
       depsMap.set(key,dep)
     }
-    // 解决activeEffect可能为undefined的操作
-    if(!activeEffect) return
+    if(dep.has(activeEffect)) return
     // 收集依赖
     dep.add(activeEffect)
     // 反向收集对应的dep
     activeEffect.depList.push(dep)
+}
+// 判断是否在收集
+export function isTracking(){
+  return shouldTrack && activeEffect !== undefined;
 }
 // 触发依赖
 // age更新了 
@@ -94,4 +103,5 @@ export function trigger(target,key){
 // reactive判断有没有调用stop函数
 export function stop(runner){
   runner.effect.stop()
+  shouldTrack = false
 }
