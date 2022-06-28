@@ -17,13 +17,25 @@
 import { 
   createProxy,
   reactiveHandler,
-  readonlyHandler 
+  readonlyHandler,
+  ReactiveFlags
 } from "./baseHandle"
+
 
 export function reactive(raw){
   return createProxy(raw,reactiveHandler)
-
 }
 export function readonly(raw){
   return createProxy(raw,readonlyHandler)
 }
+// 判断是否是响应式对象
+export function isReactive(Object){
+  return !!Object[ReactiveFlags.IS_REACTIVE]
+}
+export function isReadonly(Object){
+  return !!Object[ReactiveFlags.IS_READONLY]
+}
+// 判断是否是Proxy对象
+// export function isReactive(Object){
+//   return Object[ReactiveFlags.IS_REACTIVE]
+// }
