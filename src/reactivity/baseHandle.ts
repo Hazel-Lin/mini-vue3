@@ -1,4 +1,4 @@
-import { isObject } from "../shared";
+import { extend, isObject } from "../shared";
 import { track, trigger } from "./effect";
 import { reactive, readonly } from "./reactive";
 
@@ -6,6 +6,7 @@ import { reactive, readonly } from "./reactive";
 const get = createGetter()
 const set = createSetter()
 const getReadOnly = createGetter(true)
+const getShallowReadOnly = createGetter(true,true)
 
 export const enum ReactiveFlags {
   IS_REACTIVE = "v_isReactive",
@@ -13,7 +14,7 @@ export const enum ReactiveFlags {
 }
 
 // 创建get
-export function createGetter(isReadonly = false){
+export function createGetter(isReadonly = false, isShallowReadOnly = false){
   return function get (target,key){
     if (key === ReactiveFlags.IS_REACTIVE) {
       return !isReadonly;
@@ -21,6 +22,9 @@ export function createGetter(isReadonly = false){
       return isReadonly;
     }
     const res = Reflect.get(target,key);
+    if(isShallowReadOnly){
+      return res
+    }
     // 判断嵌套中的对象是否是reactive对象
     if(isObject(res)) return isReadonly ? readonly(res) : reactive(res)
     !isReadonly && track(target,key)
@@ -56,3 +60,7 @@ export const readonlyHandler = {
     return true
   }
 }
+// 响应式对象中嵌套的对象非响应式
+export const shallowReadonlyHandler = extend({},readonlyHandler,{
+  get:getShallowReadOnly,
+})

@@ -18,6 +18,7 @@ import {
   createProxy,
   reactiveHandler,
   readonlyHandler,
+  shallowReadonlyHandler,
   ReactiveFlags
 } from "./baseHandle"
 
@@ -35,7 +36,7 @@ export function isReactive(Object){
 export function isReadonly(Object){
   return !!Object[ReactiveFlags.IS_READONLY]
 }
-// 判断是否是Proxy对象
-// export function isReactive(Object){
-//   return Object[ReactiveFlags.IS_REACTIVE]
-// }
+// 判断是否是shallowReadonly对象 shallowReadonly内部嵌套的不是响应式对象
+export function shallowReadonly(raw){
+  return createProxy(raw,shallowReadonlyHandler)
+}
