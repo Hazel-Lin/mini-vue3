@@ -1,4 +1,6 @@
+import { isObject } from "../shared";
 import { track, trigger } from "./effect";
+import { reactive, readonly } from "./reactive";
 
 // 优化 只需要创建一次
 const get = createGetter()
@@ -19,6 +21,8 @@ export function createGetter(isReadonly = false){
       return isReadonly;
     }
     const res = Reflect.get(target,key);
+    // 判断嵌套中的对象是否是reactive对象
+    if(isObject(res)) return isReadonly ? readonly(res) : reactive(res)
     !isReadonly && track(target,key)
     return res;
   }
