@@ -75,7 +75,10 @@ export function track(target,key){
       dep = new Set()
       depsMap.set(key,dep)
     }
-    if(dep.has(activeEffect)) return
+    trackEffect(dep)
+}
+export function trackEffect(dep){
+  if(dep.has(activeEffect)) return
     // 收集依赖
     dep.add(activeEffect)
     // 反向收集对应的dep
@@ -90,7 +93,9 @@ export function isTracking(){
 export function trigger(target,key){
   let depsMap = targetMap.get(target)
   let dep = depsMap.get(key)
-
+  triggerEffect(dep)
+}
+export function triggerEffect(dep){
   for(const effect of dep){
     // 通过public获取到scheduler
     if(effect.scheduler){
