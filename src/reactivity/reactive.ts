@@ -40,3 +40,7 @@ export function isReadonly(Object){
 export function shallowReadonly(raw){
   return createProxy(raw,shallowReadonlyHandler)
 }
+// 检查对象是否是由 reactive 或 readonly 创建的 proxy。
+export function isProxy(raw){
+  return isReactive(raw) || isReadonly(raw)
+}
