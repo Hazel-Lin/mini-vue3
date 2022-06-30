@@ -3,7 +3,7 @@ import { extend } from "../shared";
 let activeEffect;
 let shouldTrack = true
 const targetMap = new Map()
-class reactiveEffect{
+export class ReactiveEffect{
   private _handle :any = null;
   public scheduler:Function | undefined
   public depList = []
@@ -39,7 +39,7 @@ function cleanupEffect(effect){
 // 副作用函数
 // 如何在更新的时候只执行scheduler
 export function effect(handle,options:any = {}) {
-  const _effect = new reactiveEffect(handle,options.scheduler)
+  const _effect = new ReactiveEffect(handle,options.scheduler)
   extend(_effect,options)
   _effect.run()
   // 返回run 方法
