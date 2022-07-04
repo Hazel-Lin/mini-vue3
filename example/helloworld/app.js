@@ -1,9 +1,18 @@
 import { h } from "../../lib/vue-thin.esm.js";
 
+// render => h => createVNode => vnode
 export const app = {
   render(){
     return h(
-     'div','this is a ' + this.msg 
+      // type: "div",
+     'div',
+     // props: {}
+      {
+        id: "root",
+        class: ["red", "blue"],
+      },
+      // children: []
+      [h("p", { class:"red"}, "hi"), h("p", {class:"blue"}, "vue-thin")]
     )
   },
   setup(){

@@ -1,4 +1,4 @@
-// createApp 放入一个根组件
+// createApp 放入一个根组件 包括render 和 setup
 import { render } from "./renderer";
 import { createVNode } from "./vnode";
 export function createApp(rootComponent){
