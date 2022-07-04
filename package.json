@@ -1,7 +1,8 @@
 {
   "name": "Vue-thin",
   "version": "1.0.0",
-  "main": "index.js",
+  "main": "lib/vue-thin.cjs.js",
+  "module": "lib/vue-thin.esm.js",
   "repository": "git@github.com:Hazel-Lin/Vue-thin.git",
   "author": "linhuizi <529246402@qq.com>",
   "license": "MIT",
@@ -18,6 +19,7 @@
     "babel-jest": "^28.1.1",
     "jest": "^27.1.0",
     "rollup": "^2.75.7",
-    "tslib": "^2.4.0"
+    "tslib": "^2.4.0",
+    "typescript": "^4.4.2"
   }
 }

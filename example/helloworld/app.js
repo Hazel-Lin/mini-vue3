@@ -1,3 +1,5 @@
+import { h } from "../../lib/vue-thin.esm.js";
+
 export const app = {
   render(){
     return h(

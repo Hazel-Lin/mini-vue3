@@ -3,17 +3,15 @@ export default{
   input: 'src/index.ts',
   output:[
     {
-    file: 'dist/index.common.js',
+    file: 'lib/vue-thin.cjs.js',
     format:'cjs',
-    name:'lib',
     },  
     {
-      file: 'dist/index.esm.js',
+      file: 'lib/vue-thin.esm.js',
       format:'es',
-      name:'lib',
-      },  
+    },  
   ],
-  plugin:[
+  plugins:[
     typescript(),
   ]
 }
