@@ -1,6 +1,7 @@
 
 import { isObject, isString } from "../shared/index";
 import { createComponentInstance, setupComponent } from "./component";
+import { createVNode } from "./vnode";
 
 export function render(vnode, container) {
   patch(vnode, container);
@@ -17,16 +18,16 @@ function processComponent(vnode: any, container: any) {
 
 function mountComponent(vnode: any, container) {
   const instance = createComponentInstance(vnode);
-
+  console.log(instance,'instance1')
   setupComponent(instance);
-  setupRenderEffect(instance, container);
+  setupRenderEffect(instance, container,vnode);
 }
 function processElement(vnode: any, container: any) {
   mountElement(vnode, container);
 }
 function mountElement(vnode: any, container:any) {
   const {type, props, children} = vnode;
-  const el = document.createElement(type);
+  const el = vnode.el = document.createElement(type);
   if(isObject(props)){
     for (const key in props) {
       el.setAttribute(key, props[key]);
@@ -47,7 +48,11 @@ function mountChildren(vnode, container) {
   });
 }
 
-function setupRenderEffect(instance: any, container) {
-  var subTree = instance.render();
+function setupRenderEffect(instance: any, container,vnode:any) {
+  // 调用时绑定到代理对象上
+  const { proxy } = instance;
+  var subTree = instance.render.call(proxy);
   patch(subTree, container);
+  // 根节点的el  赋值给组件的虚拟节点上
+  vnode.el = subTree.el;
 }
