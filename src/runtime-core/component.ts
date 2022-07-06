@@ -1,3 +1,4 @@
+import { isObject } from "../shared/index";
 import { PublicInstanceProxyHandlers } from "./componentPublicInstance";
 
 export function createComponentInstance(vnode) {
@@ -14,12 +15,9 @@ export function setupComponent(instance) {
   // TODO
   // initProps()
   // initSlots()
-  console.log(instance,'instance123')
   setupStatefulComponent(instance);
 }
-const publicPropertiesMap = {
-  $el:(i)=>i.vnode.el
-}
+
 function setupStatefulComponent(instance: any) {
   const Component = instance.type;
   // 创建一个代理对象 获取setupState中的值
@@ -35,9 +33,8 @@ function setupStatefulComponent(instance: any) {
 }
 
 function handleSetupResult(instance, setupResult: any) {
-  // function Object
-  // TODO function
-  if (typeof setupResult === "object") {
+  
+  if (isObject(setupResult)) {
     instance.setupState = setupResult;
   }
 
