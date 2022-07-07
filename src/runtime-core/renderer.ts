@@ -1,4 +1,5 @@
 
+import { isOn } from "../shared/index";
 import { ShapeFlags } from "../shared/shapeFlags";
 import { createComponentInstance, setupComponent } from "./component";
 
@@ -30,12 +31,18 @@ function processElement(vnode: any, container: any) {
 function mountElement(vnode: any, container:any) {
   const {type, props, children, shapeFlag} = vnode;
   const el = vnode.el = document.createElement(type);
+  // const isOn = (key:string) => key.startsWith("on");
+  // const isOn = (key:string) => /^on[A-Z]/.test(key)
   for (const key in props) {
-    el.setAttribute(key, props[key]);
-  }
+    if(isOn(key)){
+      el.addEventListener(key.slice(2).toLowerCase(),props[key]);
+    }else {
+      el.setAttribute(key, props[key]);
+    }
   shapeFlag & ShapeFlags.TEXT_CHILDREN && (el.innerHTML = children);
   shapeFlag & ShapeFlags.ARRAY_CHILDREN && mountChildren(vnode, el);
   container.append(el);
+  }
 }
 function mountChildren(vnode, container) {
   vnode.children.forEach((v) => {

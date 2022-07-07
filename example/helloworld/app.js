@@ -12,6 +12,7 @@ export const app = {
       {
         id: "root",
         class: ["red", "blue"],
+        onClick:() =>{ console.log('click') }
       },
       // this.$el 为获取到的根元素 此时为root
       // this.$el,
