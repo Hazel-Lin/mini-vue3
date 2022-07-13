@@ -42,6 +42,10 @@ export function createSetter(isReadonly = false){
 
 // 创建Proxy
 export function createProxy(raw,handle){
+  if (!isObject(raw)) {
+    console.warn(`target ${raw} 必须是一个对象`);
+    return raw
+  }
   return new Proxy(raw,handle)
 }
 
