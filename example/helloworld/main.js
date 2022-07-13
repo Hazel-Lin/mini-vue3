@@ -1,5 +1,5 @@
 import { createApp } from "../../lib/vue-thin.esm.js";
-import { app } from "./app.js";
+import { App } from "./app.js";
 
 const rootContainer = document.querySelector("#app");
-createApp(app).mount(rootContainer);
+createApp(App).mount(rootContainer);

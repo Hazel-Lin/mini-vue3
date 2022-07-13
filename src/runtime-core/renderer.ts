@@ -39,10 +39,10 @@ function mountElement(vnode: any, container:any) {
     }else {
       el.setAttribute(key, props[key]);
     }
+  }
   shapeFlag & ShapeFlags.TEXT_CHILDREN && (el.innerHTML = children);
   shapeFlag & ShapeFlags.ARRAY_CHILDREN && mountChildren(vnode, el);
   container.append(el);
-  }
 }
 function mountChildren(vnode, container) {
   vnode.children.forEach((v) => {
