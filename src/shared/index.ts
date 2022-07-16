@@ -13,3 +13,17 @@ export const hasOwn = (val, key) =>
 
 const onRE = /^on[^a-z]/
 export const isOn = (key: string) => onRE.test(key)
+
+export const camelize = (str: string) => {
+  return str.replace(/-(\w)/g, (_, c: string) => {
+    return c ? c.toUpperCase() : "";
+  });
+};
+
+const capitalize = (str: string) => {
+  return str.charAt(0).toUpperCase() + str.slice(1);
+};
+
+export const toHandlerKey = (str: string) => {
+  return str ? "on" + capitalize(str) : "";
+};
