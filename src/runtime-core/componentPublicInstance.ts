@@ -1,5 +1,6 @@
 const publicPropertiesMap = {
-  $el:(i)=>i.vnode.el
+  $el: (i)=>i.vnode.el,
+  $slots: (i)=>i.slots
 }
 
 export const PublicInstanceProxyHandlers = {
@@ -13,7 +14,7 @@ export const PublicInstanceProxyHandlers = {
     if(key in props){
       return props[key];
     }
-    // 当我们调用$el时 key为$el
+    // 当我们调用$el时 key为$el $slots key为$slots
     const publicGetter = publicPropertiesMap[key]
     if(publicGetter){
       return publicGetter(instance) 

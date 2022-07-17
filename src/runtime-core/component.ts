@@ -1,12 +1,15 @@
 import { shallowReadonly } from "../reactivity/reactive";
-import { isObject } from "../shared/index";
+import { isArray, isObject } from "../shared/index";
 import { PublicInstanceProxyHandlers } from "./componentPublicInstance";
 import { emit } from "./componentEmit";
+import { ShapeFlags } from "../shared/shapeFlags";
 export function createComponentInstance(vnode) {
   const component = {
     vnode,
     type: vnode.type,
     emit: () => {},
+    props: {},
+    slots:{},
     setupState:{}
   };
   component.emit = emit.bind(null, component) as any;
@@ -15,12 +18,29 @@ export function createComponentInstance(vnode) {
 // 在component对象上添加props属性
 function initProps(instance,rawProps){
   instance.props = rawProps || {}
-  console.log(instance.props, "instance.props");
+}
+// 在component对象上添加slots属性 
+function initSlots(instance,children){
+  const { vnode } = instance;
+  if (vnode.shapeFlag & ShapeFlags.SLOT_CHILDREN) {
+    normalizeObjectSlots(children, instance.slots);
+  }
+}
+function normalizeObjectSlots(children: any, slots: any) {
+  for (const key in children) {
+    const value = children[key];
+    // value 是一个函数
+    slots[key] = (params) => normalizeSlotValue(value(params));
+  }
+}
+
+function normalizeSlotValue(value) {
+  return isArray(value) ? value : [value];
 }
 
 export function setupComponent(instance) {
   initProps(instance,instance.vnode.props)
-  // initSlots()
+  initSlots(instance,instance.vnode.children)
   setupStatefulComponent(instance);
 }
 
