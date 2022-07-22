@@ -5,7 +5,8 @@ export const renderSlots = (slots,name,params)=> {
   const slotName = slots[name];
   if(slotName){
     if(isFunction(slotName)){
-    return createVNode("div", {}, slotName(params))
+      // 避免渲染多余的div节点
+      return createVNode("Fragment", {}, slotName(params))
     }
   }
 }
