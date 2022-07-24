@@ -3,6 +3,8 @@ import { isArray, isObject } from "../shared/index";
 import { PublicInstanceProxyHandlers } from "./componentPublicInstance";
 import { emit } from "./componentEmit";
 import { ShapeFlags } from "../shared/shapeFlags";
+
+let currentInstance = null
 export function createComponentInstance(vnode) {
   const component = {
     vnode,
@@ -53,10 +55,11 @@ function setupStatefulComponent(instance: any) {
   const { setup } = Component;
 
   if (setup) {
+    setCurrentInstance(instance);
     const setupResult = setup(shallowReadonly(instance.props),{
       emit: instance.emit,
     });
-
+    setCurrentInstance(null);
     handleSetupResult(instance, setupResult);
   }
 }
@@ -73,4 +76,12 @@ function handleSetupResult(instance, setupResult: any) {
 function finishComponentSetup(instance: any) {
   const Component = instance.type;
   instance.render = Component.render;
+}
+
+export function getCurrentInstance() {
+  return currentInstance;
+}
+
+function setCurrentInstance(instance) {
+  currentInstance = instance;
 }
