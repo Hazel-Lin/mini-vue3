@@ -5,13 +5,15 @@ import { emit } from "./componentEmit";
 import { ShapeFlags } from "../shared/shapeFlags";
 
 let currentInstance = null
-export function createComponentInstance(vnode) {
+export function createComponentInstance(vnode,parent) {
   const component = {
     vnode,
     type: vnode.type,
     emit: () => {},
     props: {},
     slots:{},
+    provides: parent ? parent.provides : {},
+    parent,
     setupState:{}
   };
   component.emit = emit.bind(null, component) as any;
