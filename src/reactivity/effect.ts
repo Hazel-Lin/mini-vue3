@@ -14,8 +14,10 @@ export class ReactiveEffect{
     this.scheduler = scheduler
   }
   run(){
+    // this为当前实例对象
     activeEffect = this
     shouldTrack = true
+    // 返回执行函数的返回值
     return this._handle()
   }
   // 调用stop方法后 删除掉对应的effect
@@ -36,11 +38,12 @@ function cleanupEffect(effect){
 }
 
 
-// 副作用函数
+// 副作用函数 调用后返回runner函数
 // 如何在更新的时候只执行scheduler
 export function effect(handle,options:any = {}) {
   const _effect = new ReactiveEffect(handle,options.scheduler)
   extend(_effect,options)
+  // 调用run方法执行依赖
   _effect.run()
   // 返回run 方法
   const runner:any = _effect.run.bind(_effect)
@@ -55,7 +58,7 @@ export function effect(handle,options:any = {}) {
  * 名称不能重复
  * 获取到target对象中的每一个key对应的值
  * targetMap 所有响应式对象
- * depsMap 具体某一个响应式对象的key的依赖
+ * depsMap 具体某一个响应式对象的key的所有依赖
  * dep 具体某一个key的依赖
  * 初始化的时候
  * targetMap Map(0) {{ age:10 } => depsMap Map(0)}
