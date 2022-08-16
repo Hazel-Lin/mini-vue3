@@ -1,15 +1,13 @@
-// createApp 放入一个根组件 包括render 和 setup
-import { render } from "./renderer";
 import { createVNode } from "./vnode";
-export function createApp(rootComponent){
-  return { 
-    mount(rootContainer){
-      // 组件转换为虚拟节点
-      const VNode = createVNode(rootComponent)
 
-      render(VNode, rootContainer);
-    }
-  }
+export function createAppAPI(render) {
+  return function createApp(rootComponent) {
+    return {
+      mount(rootContainer) {
+        const vnode = createVNode(rootComponent);
+
+        render(vnode, rootContainer);
+      },
+    };
+  };
 }
-
-
