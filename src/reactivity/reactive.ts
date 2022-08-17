@@ -22,7 +22,7 @@ import {
   ReactiveFlags
 } from "./baseHandle"
 
-
+// raw为目标对象 需要代理的对象
 export function reactive(raw){
   return createProxy(raw,reactiveHandler)
 }

@@ -47,6 +47,7 @@ export function effect(handle,options:any = {}) {
   _effect.run()
   // 返回run 方法
   const runner:any = _effect.run.bind(_effect)
+  // 将effect添加到runner中便于后续其他地方调用
   runner.effect = _effect
   return runner
 }
@@ -108,7 +109,7 @@ export function triggerEffect(dep){
     }
   }
 }
-// reactive判断有没有调用stop函数
+// reactive判断有没有调用stop函数 runner为effect函数的返回值
 export function stop(runner){
   runner.effect.stop()
   shouldTrack = false

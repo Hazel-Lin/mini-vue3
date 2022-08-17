@@ -15,17 +15,21 @@ class Ref{
   }
   get value(){
     if(isTracking()){
+      // 收集依赖
       trackEffect(this.deps)
     }
     return this._value
   }
   set value(newValue){
+    // 判断两者是否相等 相等则return
     if(!hasChanged(newValue, this._rawValue)) return
     this._rawValue = newValue
     this._value = convert(newValue)
+    // 触发依赖
     triggerEffect(this.deps)
   }
 }
+// 判断是否是对象  如果将一个对象赋值给 ref，那么这个对象将通过 reactive() 转为具有深层次响应式的对象。
 function convert(value){
   return isObject(value) ? reactive(value) : value
 }
