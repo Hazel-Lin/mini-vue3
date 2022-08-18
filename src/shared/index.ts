@@ -28,3 +28,6 @@ const capitalize = (str: string) => {
 export const toHandlerKey = (str: string) => {
   return str ? "on" + capitalize(str) : "";
 };
+export const isEqual = (oldVal:any,newVal:any) => {
+  return oldVal === newVal
+};

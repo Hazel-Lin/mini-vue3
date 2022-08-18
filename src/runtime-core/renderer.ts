@@ -3,6 +3,7 @@ import { createComponentInstance, setupComponent } from "./component";
 import { Fragment,Text } from "./vnode";
 import { createAppAPI } from "./createApp";
 import { effect } from "../reactivity/effect";
+import { isEqual } from "../shared";
 
 export function createRenderer(options){
   const {
@@ -62,14 +63,24 @@ export function createRenderer(options){
     console.log('props1',n1.props);
     console.log('props2',n2.props);
     // 值发生改变就需要更新
-    const oldProps = n1.props;
-    const newProps = n2.props;
-    const el = (n2.el = n1.el);
-    for(const key in newProps){
-      const oldValue = oldProps[key];
-      const newValue = newProps[key];
-      if(oldValue !== newValue){
-        hostPatchProp(el,key,oldValue,newValue);
+    const EMPTY_OBJ = {}
+    const oldProps = n1.props || EMPTY_OBJ;
+    const newProps = n2.props || EMPTY_OBJ;
+    if(!isEqual(oldProps,newProps)){
+      const el = (n2.el = n1.el);
+      for(const key in newProps){
+        const oldValue = oldProps[key];
+        const newValue = newProps[key];
+        if(oldValue !== newValue){
+          hostPatchProp(el,key,oldValue,newValue);
+        }
+      }
+      if(oldProps !== EMPTY_OBJ){
+        for(const key in oldProps){
+          if(!(key in newProps)){
+            hostPatchProp(el,key,oldProps[key],null);
+          }
+        }
       }
     }
   }
