@@ -59,26 +59,29 @@ export function createRenderer(options){
     }
   }
   function patchElement(n1,n2, container){
-    console.log('patchElement',n1,n2, container);
+    console.log('props1',n1.props);
+    console.log('props2',n2.props);
+    // 值发生改变就需要更新
+    const oldProps = n1.props;
+    const newProps = n2.props;
+    const el = (n2.el = n1.el);
+    for(const key in newProps){
+      const oldValue = oldProps[key];
+      const newValue = newProps[key];
+      if(oldValue !== newValue){
+        hostPatchProp(el,key,oldValue,newValue);
+      }
+    }
   }
   function mountElement(vnode: any, container:any, parentComponent) {
     const {type, props, children, shapeFlag} = vnode;
     const el = (vnode.el = hostCreateElement(type));
-    // const el = vnode.el = document.createElement(type);
-    // const isOn = (key:string) => key.startsWith("on");
-    // const isOn = (key:string) => /^on[A-Z]/.test(key)
     for (const key in props) {
       const val = props[key];
-      hostPatchProp(el, key, val);
-      // if(isOn(key)){
-      //   el.addEventListener(key.slice(2).toLowerCase(),props[key]);
-      // }else {
-      //   el.setAttribute(key, props[key]);
-      // }
+      hostPatchProp(el, key,null, val);
     }
     shapeFlag & ShapeFlags.TEXT_CHILDREN && (el.innerHTML = children);
     shapeFlag & ShapeFlags.ARRAY_CHILDREN && mountChildren(vnode, el,parentComponent);
-    // container.append(el);
     hostInsert(el, container);
   }
   function mountChildren(vnode, container,parentComponent) {
