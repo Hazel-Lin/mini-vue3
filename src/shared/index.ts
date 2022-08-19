@@ -31,3 +31,4 @@ export const toHandlerKey = (str: string) => {
 export const isEqual = (oldVal:any,newVal:any) => {
   return oldVal === newVal
 };
+export const EMPTY_OBJ = {}

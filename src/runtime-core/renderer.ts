@@ -3,13 +3,15 @@ import { createComponentInstance, setupComponent } from "./component";
 import { Fragment,Text } from "./vnode";
 import { createAppAPI } from "./createApp";
 import { effect } from "../reactivity/effect";
-import { isEqual } from "../shared";
+import { EMPTY_OBJ, isEqual } from "../shared";
 
 export function createRenderer(options){
   const {
     createElement: hostCreateElement,
     patchProp: hostPatchProp,
     insert: hostInsert,
+    remove: hostRemove,
+    setElementText: hostSetElementText
   } = options;
   function render(vnode, container) {
     patch(null,vnode, container, null);
@@ -56,18 +58,62 @@ export function createRenderer(options){
     if(!n1){
       mountElement(n2, container,parentComponent);
     }else{
-      patchElement(n1,n2, container);
+      patchElement(n1,n2, container,parentComponent);
     }
   }
-  function patchElement(n1,n2, container){
-    console.log('props1',n1.props);
-    console.log('props2',n2.props);
-    // 值发生改变就需要更新
-    const EMPTY_OBJ = {}
+
+  function patchElement(n1,n2, container,parentComponent){
+    // 值发生改变就需要更新 window.isChange.value = true
     const oldProps = n1.props || EMPTY_OBJ;
     const newProps = n2.props || EMPTY_OBJ;
+    const el = (n2.el = n1.el);
+
+    patchProps(el,oldProps,newProps);
+    // 如果传递的值为container 则直接插入到container中 其他节点会受到影响
+    // ”主页“ 这个节点是什么时候被渲染上去的？
+    // patchChildren(n1,n2,container,parentComponent);
+    patchChildren(n1,n2,el,parentComponent);
+
+  }
+  // 1. 老节点是数组 新节点是text 需要卸载老节点 并且设置text作为新节点
+  // 2. 老节点是text 新节点是数组 需要直接移除老节点 并且mountChildren数组新节点
+  function patchChildren(n1,n2,container,parentComponent){
+    const { children: oc, shapeFlag: oldShapeFlag } = n1
+    const { children: nc, shapeFlag: newShapeFlag } = n2
+    
+    if(!isEqual(oc,nc)){
+      // 老节点是数组 新节点是text 
+      if(newShapeFlag & ShapeFlags.TEXT_CHILDREN){
+        oldShapeFlag & ShapeFlags.ARRAY_CHILDREN && unmountChildren(oc);
+        // (n2.el.innerHTML = nc);
+        // 应该为container 而不是n2.el
+        // hostSetElementText(n2.el,nc);
+        hostSetElementText(container,nc);
+
+      }
+      // 老节点是text 新节点是数组
+      if(newShapeFlag & ShapeFlags.ARRAY_CHILDREN){
+        // oldShapeFlag & ShapeFlags.TEXT_CHILDREN && n1.el.remove();
+        // 应该为container 而不是n2.el
+        oldShapeFlag & ShapeFlags.TEXT_CHILDREN && hostSetElementText(container,'');
+        // 挂载数组节点
+        mountChildren(nc,container,parentComponent);
+      }
+    }
+  }
+  // 当节点为数组的时候 更新节点才需要先去卸载节点
+  function unmountChildren(children){
+    children.forEach(child => {
+      hostRemove(child.el);
+      // 以下也为卸载节点的方式
+      // if(child.shapeFlag & ShapeFlags.ELEMENT){
+      //   child.el.remove();
+      // }
+    })
+  }
+
+  function patchProps(el, oldProps, newProps) {
     if(!isEqual(oldProps,newProps)){
-      const el = (n2.el = n1.el);
       for(const key in newProps){
         const oldValue = oldProps[key];
         const newValue = newProps[key];
@@ -92,11 +138,11 @@ export function createRenderer(options){
       hostPatchProp(el, key,null, val);
     }
     shapeFlag & ShapeFlags.TEXT_CHILDREN && (el.innerHTML = children);
-    shapeFlag & ShapeFlags.ARRAY_CHILDREN && mountChildren(vnode, el,parentComponent);
+    shapeFlag & ShapeFlags.ARRAY_CHILDREN && mountChildren(vnode.children, el,parentComponent);
     hostInsert(el, container);
   }
-  function mountChildren(vnode, container,parentComponent) {
-    vnode.children.forEach((v) => {
+  function mountChildren(children, container,parentComponent) {
+    children.forEach((v) => {
       patch(null,v, container,parentComponent);
     });
   }
@@ -111,7 +157,6 @@ export function createRenderer(options){
         patch(null,subTree, container,instance);
         // 根节点的el  赋值给组件的虚拟节点上
         vnode.el = subTree.el;
-        console.log('subTree',subTree)
         instance.isMounted = true;
       }else{
         console.log('更新')
@@ -119,8 +164,6 @@ export function createRenderer(options){
         var subTree = instance.render.call(proxy);
         // 获取旧值
         var prevSubTree = instance.subTree;
-        console.log('prevSubTree',prevSubTree)
-        console.log('subTree',subTree)
         // 更新旧值
         instance.subTree = subTree;
         patch(prevSubTree,subTree, container,instance);
