@@ -32,3 +32,8 @@ export const isEqual = (oldVal:any,newVal:any) => {
   return oldVal === newVal
 };
 export const EMPTY_OBJ = {}
+
+export function isSameVNodeType(n1: any, n2: any): boolean {
+  // 比较type和key是否相等
+  return n1.type === n2.type && n1.key === n2.key
+}

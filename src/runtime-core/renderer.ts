@@ -3,7 +3,7 @@ import { createComponentInstance, setupComponent } from "./component";
 import { Fragment,Text } from "./vnode";
 import { createAppAPI } from "./createApp";
 import { effect } from "../reactivity/effect";
-import { EMPTY_OBJ, isEqual } from "../shared";
+import { EMPTY_OBJ, isEqual,isSameVNodeType } from "../shared";
 
 export function createRenderer(options){
   const {
@@ -92,12 +92,20 @@ export function createRenderer(options){
 
       }
       // 老节点是text 新节点是数组
+      // 当新老节点都是数组时 需要用到我们常说的diff算法去对比
       if(newShapeFlag & ShapeFlags.ARRAY_CHILDREN){
-        // oldShapeFlag & ShapeFlags.TEXT_CHILDREN && n1.el.remove();
-        // 应该为container 而不是n2.el
-        oldShapeFlag & ShapeFlags.TEXT_CHILDREN && hostSetElementText(container,'');
-        // 挂载数组节点
-        mountChildren(nc,container,parentComponent);
+        if(oldShapeFlag & ShapeFlags.TEXT_CHILDREN){
+          // oldShapeFlag & ShapeFlags.TEXT_CHILDREN && n1.el.remove();
+          // 应该为container 而不是n2.el
+          oldShapeFlag & ShapeFlags.TEXT_CHILDREN && hostSetElementText(container,'');
+          // 挂载数组节点
+          mountChildren(nc,container,parentComponent);
+        }else{
+          if(oldShapeFlag & ShapeFlags.ARRAY_CHILDREN){
+            patchKeyedChildren(oc,nc,container,parentComponent);
+          }
+        }
+       
       }
     }
   }
@@ -110,6 +118,61 @@ export function createRenderer(options){
       //   child.el.remove();
       // }
     })
+  }
+  // 新旧节点做diff算法 对比是否相等
+  function patchKeyedChildren(c1,c2,container,parentComponent){
+    console.log('patchKeyedChildren',c1,c2);
+    
+    let i = 0
+    const l2 = c2.length;
+
+    // c1、c2的长度索引
+    let e1 = c1.length -1;
+    let e2 = c2.length -1
+    // i的值必须小于两个数组的长度
+    // 左侧
+    while( i <= e1 && i <= e2){
+      // 两者相等 则继续patch
+      const n1 = c1[i];
+      const n2 = c2[i];
+      if(isSameVNodeType(n1,n2)){
+        console.log(c1[i],c2[i],1111)
+        patch(n1,n2,container,parentComponent);
+      }else{
+        break
+      }
+      i++
+    }
+
+    // 右侧
+    while( i <= e1 && i <= e2){
+      const n1 = c1[e1];
+      const n2 = c2[e2];
+      if(isSameVNodeType(n1,n2)){
+        console.log(n1,n2,1111)
+        patch(n1,n2,container,parentComponent);
+      }else{
+        break
+      }
+      e1--;
+      e2--;
+    }
+
+    // 新的比老的长
+    if(i > e1){
+      if(i <= e2){
+        // 找到对应的锚点位置
+        const nextPos = e2 + 1;
+        const anchor = nextPos < l2 ? c2[nextPos].el : null;
+        //  因为新增的节点不止有一个 需要while循环 遍历所有
+        while(i <= e2){
+          // create a new vnode
+          patch(null,c2[i],container,parentComponent,anchor);
+          i++
+        }
+      }
+    } 
+
   }
 
   function patchProps(el, oldProps, newProps) {
