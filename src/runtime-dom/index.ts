@@ -18,10 +18,9 @@ function patchProp(el, key, prevVal, newVal) {
     }
   }
 }
-
-function insert(el, parent,achor) {
-  parent.append(el);
-  parent.insertBefore(el, achor);
+// 关于不传值没有出现报错的问题 有待理解
+function insert(el, parent,anchor) {
+  parent.insertBefore(el, anchor || null);
 }
 function remove(child) {
   const parent = child.parentNode;
