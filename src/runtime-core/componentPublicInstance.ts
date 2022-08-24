@@ -1,6 +1,8 @@
 const publicPropertiesMap = {
   $el: (i)=>i.vnode.el,
-  $slots: (i)=>i.slots
+  $slots: (i)=>i.slots,
+  // 新增$props 表示组件当前已解析的 props 对象。
+  $props:(i) => i.props
 }
 
 export const PublicInstanceProxyHandlers = {

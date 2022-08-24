@@ -4,6 +4,7 @@ import { Fragment,Text } from "./vnode";
 import { createAppAPI } from "./createApp";
 import { effect } from "../reactivity/effect";
 import { EMPTY_OBJ, isEqual } from "../shared";
+import { shouldUpdateComponent } from "./componentUpdateUtils";
 
 export function createRenderer(options){
   const {
@@ -46,13 +47,37 @@ export function createRenderer(options){
   }
 
   function processComponent(n1,n2: any, container: any,parentComponent,anchor) {
-    mountComponent(n2, container,parentComponent,anchor);
+    if(!n1){
+      mountComponent(n2, container,parentComponent,anchor);
+    }else{
+      updateComponent(n1,n2);
+    }
+  }
+  // 调用render函数 生成虚拟节点 后patch
+  // 1.更新组件数据
+  // 2.调用render函数
+  // 3.更新前判断是否需要更新
+  function updateComponent(n1,n2){
+    const instance = (n2.component = n1.component);
+    // 避免多余的更新操作
+    if (shouldUpdateComponent(n1, n2)) {
+      // 通过next传递 使instance获取到更新后的虚拟节点
+      instance.next = n2;
+      instance.update();
+    } else {
+      // 不需要更新时 需要重置
+      n2.el = n1.el;
+      instance.vnode = n2;
+    }
   }
 
-  function mountComponent(vnode: any, container,parentComponent,anchor) {
-    const instance = createComponentInstance(vnode,parentComponent);
+  function mountComponent(initialVNode: any, container,parentComponent,anchor) {
+    const instance = (initialVNode.component = createComponentInstance(
+      initialVNode,
+      parentComponent
+    ));
     setupComponent(instance);
-    setupRenderEffect(instance, container,vnode,anchor);
+    setupRenderEffect(instance, container,initialVNode,anchor);
   }
   function processElement(n1,n2: any, container: any,parentComponent,anchor) {
     if(!n1){
@@ -292,7 +317,7 @@ export function createRenderer(options){
   }
 
   function setupRenderEffect(instance: any, container,vnode:any,anchor) {
-    effect(()=>{
+    instance.update = effect(()=>{
       if(!instance.isMounted){
         console.log('初始化')
         // 调用时绑定到代理对象上
@@ -303,13 +328,20 @@ export function createRenderer(options){
         vnode.el = subTree.el;
         instance.isMounted = true;
       }else{
+        // 页面操作后 触发更新
         console.log('更新')
-        const { proxy } = instance;
+        // 获取更新后的虚拟节点 vnode旧节点
+        const { next, vnode, proxy } = instance;
+        if (next) {
+          next.el = vnode.el;
+          updateComponentPreRender(instance, next);
+        }
         var subTree = instance.render.call(proxy);
         // 获取旧值
         var prevSubTree = instance.subTree;
         // 更新旧值
         instance.subTree = subTree;
+        // 调用patch后更新或者创建节点
         patch(prevSubTree,subTree, container,instance,anchor);
       }
     })
@@ -318,6 +350,12 @@ export function createRenderer(options){
     createApp: createAppAPI(render),
   };
 }
+function updateComponentPreRender(instance, nextVNode) {
+  instance.vnode = nextVNode;
+  instance.next = null;
+  instance.props = nextVNode.props;
+}
+// 最长递增子序列
 function getSequence(arr) {
   const p = arr.slice();
   const result = [0];
