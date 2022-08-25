@@ -5,6 +5,7 @@ import { createAppAPI } from "./createApp";
 import { effect } from "../reactivity/effect";
 import { EMPTY_OBJ, isEqual } from "../shared";
 import { shouldUpdateComponent } from "./componentUpdateUtils";
+import { queueJobs } from "./scheduler";
 
 export function createRenderer(options){
   const {
@@ -343,6 +344,11 @@ export function createRenderer(options){
         instance.subTree = subTree;
         // 调用patch后更新或者创建节点
         patch(prevSubTree,subTree, container,instance,anchor);
+      }
+    },{
+      // 加入异步队列 scheduler就不会反复执行effect函数
+      scheduler:()=>{
+        queueJobs(instance.update)
       }
     })
   }
