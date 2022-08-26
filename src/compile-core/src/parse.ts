@@ -37,10 +37,30 @@ function parseChildren(context) {
     // { type: 2, tag: 'div' }
     // console.log(node,'node');
   }
+  // 解析文本
+  if (!node) {
+    node = parseText(context);
+  }
+    
   nodes.push(node)
   // [ { type: 0, content: { type: 1, content: 'message' } } ]
   // console.log(nodes,'nodes');
   return nodes
+}
+  // 解析文本
+function parseText(context){
+  // console.log('context',context.source,context.source.length);
+  // 获取到数据 删除空格
+  // 删除获取后的代码
+  // 直接返回文本节点内容
+  // const content = context.source
+  const content = context.source.slice(0, context.source.length)
+  console.log('content',content,content.length);
+  advanceBy(context, content.length)
+  return {
+    type: NodeTypes.TEXT,
+    content,
+  };
 }
 function parseElement(context){
   // 处理开始标签 返回tag节点
