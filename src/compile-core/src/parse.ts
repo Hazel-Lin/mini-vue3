@@ -2,6 +2,10 @@ import { NodeTypes } from "./ast";
 
 const start = "{{"
 const end = "}}"
+const enum TagType {
+  Start,
+  End,
+}
 // ast 是一个对象 包含type和children属性
 // children是一个数组 包含子节点
 // children[0]是一个对象 包含type和content属性
@@ -23,11 +27,45 @@ function parseChildren(context) {
   // context = { source: '{{ message }}' }
   if(context.source.startsWith(start)){
     node = parseInterpolation(context)
+  }else if(context.source.startsWith('<')){
+    // 如果第一位是< 则解析element 再判断是否是字母
+    console.log(context,'context');
+    // { source: '<div></div>' } context
+    if (/[a-z]/i.test(context.source[1])) {
+      node = parseElement(context);
+    }
+    // { type: 2, tag: 'div' }
+    // console.log(node,'node');
   }
   nodes.push(node)
   // [ { type: 0, content: { type: 1, content: 'message' } } ]
   // console.log(nodes,'nodes');
   return nodes
+}
+function parseElement(context){
+  // 处理开始标签 返回tag节点
+  const element = parseTag(context, TagType.Start)
+  // 处理结束标签
+  parseTag(context,TagType.End)
+  return element;
+}
+// 此时context应该是 <div></div>
+function parseTag(context,type:TagType){
+  // console.log('context2',context);
+
+  const match:any = /^<\/?([a-z]*)/i.exec(context.source)
+  console.log('match',match);
+  const tag = match[1]
+  // 删除处理完成的标签
+  advanceBy(context, match[0].length);
+  advanceBy(context, 1);
+  console.log('context.source',context.source);
+  // 处理结束标签时 不需要返回节点
+  if (type === TagType.End) return;
+  return {
+    type: NodeTypes.ELEMENT,
+    tag,
+  };
 }
 // 解析插值 '{{ message }}'
 function parseInterpolation(context) {
@@ -60,9 +98,9 @@ function parseInterpolation(context) {
   };
 }
 function advanceBy(context: any, length: number) {
-  console.log('context1',context);
+  // console.log('context1',context);
   context.source = context.source.slice(length);
-  console.log('context2',context);
+  // console.log('context2',context);
 
 }
 function createRoot(children) {
