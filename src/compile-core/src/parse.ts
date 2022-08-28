@@ -24,10 +24,10 @@ function createParserContext(content) {
 // <div><p>hi</p>{{message}}</div> 解析元素  解析元素 解析文本 解析插值
 // <div>hi,{{message}}</div>
 // 1. 循环判断属于哪个类型
-function parseChildren(context,parseEndTag) {
+function parseChildren(context,ancestors) {
   const nodes:any[] = []
   // console.log('isEnd(context)',isEnd(context));
-  while(!isEnd(context,parseEndTag)){
+  while(!isEnd(context,ancestors)){
     let node;
     // context = { source: '{{ message }}' }
     if(context.source.startsWith(start)){
@@ -37,7 +37,7 @@ function parseChildren(context,parseEndTag) {
       // console.log(context,'context1');
       // { source: '<div></div>' } context
       if (/[a-z]/i.test(context.source[1])) {
-        node = parseElement(context);
+        node = parseElement(context,ancestors);
       }
       // { type: 2, tag: 'div' }
     }
@@ -67,38 +67,44 @@ function parseText(context){
 
   let endIndex = context.source.length
   // 当同时遇到{{或<时 比较两者的index值 取最小的
-  console.log(context.source,'context.source');
+  // console.log(context.source,'context.source');
 
   for (let i = 0; i < endTokens.length; i++) {
     const index = context.source.indexOf(endTokens[i]);
-  console.log(index,'index');
 
     if (index !== -1 && endIndex > index) {
       endIndex = index
     }
   }
-  console.log(endIndex,'endIndex');
+  // console.log(endIndex,'endIndex');
 
   // if(context.source.indexOf(endTokens) > -1){
   //   endIndex = context.source.indexOf(endTokens)
   // }
   const content = parseTextData(context, endIndex);
-  console.log('content---------',content);
+  // console.log('content---------',content);
 
   return {
     type: NodeTypes.TEXT,
     content,
   };
 }
-function parseElement(context){
+function parseElement(context,ancestors) {
   // 处理开始标签 返回tag节点
   const element:any = parseTag(context, TagType.Start)
-  // 递归调用parseChildren
-  element.children = parseChildren(context,element.tag)
-  // console.log(element,'element');
+  ancestors.push(element)
 
-  // 处理结束标签
-  parseTag(context,TagType.End)
+  // 递归调用parseChildren
+  element.children = parseChildren(context,ancestors)
+  // console.log(element,'element');
+  ancestors.pop();
+
+  if (startsWithEndTagOpen(context.source, element.tag)) {
+    // 处理结束标签
+    parseTag(context, TagType.End);
+  } else {
+    throw new Error(`缺少结束标签:${element.tag}`);
+  }
   return element;
 }
 // 设置一个全局变量
@@ -107,7 +113,6 @@ function parseElement(context){
 function parseTag(context,type:TagType){
   // console.log('context2',context);
   // <div>hi,{{message}}</div>
-  // console.log(context.source,'11111111');
 
   const match:any = /^<\/?([a-z]*)/i.exec(context.source)
   // console.log('match-----',match);
@@ -162,14 +167,30 @@ function createRoot(children) {
     children,
   };
 }
-
-function isEnd(context: any,parseEndTag) {
+// <div><span></div> 只要在数组中找到和结束标签相同的标签就结束 并且报错
+// 每一次parseElement的时候都将tag标签存储在一个数组中
+function isEnd(context: any, ancestors) {
   // 1. 当source为空时 返回true
   // 2. 当遇到结束标签时 返回true
-  if(context.source.startsWith(`</${parseEndTag}>`)){
-    return true;
+  const s = context.source;
+  if(s.startsWith('</')){
+    for(let i = ancestors.length -1 ; i >= 0; i--){
+      let tag  = ancestors[i].tag;
+      if (startsWithEndTagOpen(s, tag)) {
+        return true;
+     }
+    }
   }
- return !context.source
+  // if(s.startsWith(`</${ancestors}>`)){
+  //   return true;
+  // }
+ return !s
+}
+function startsWithEndTagOpen(source, tag) {
+  return (
+    source.startsWith("</") &&
+    source.slice(2, 2 + tag.length).toLowerCase() === tag.toLowerCase()
+  );
 }
 function parseTextData(context: any, length: any) {
   const content = context.source.slice(0, length);
