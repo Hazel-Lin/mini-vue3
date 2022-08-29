@@ -1,10 +1,14 @@
 // 1. 找到对应节点  深度优先
 // 2. 修改节点内容
-export const transform = (root, options) => {
+export const transform = (root, options={}) => {
   console.log('transform',root);
   const context:any = createTransformContext(root, options);
   console.log('context',context);
   traverseNode(root, context);
+  createRootChildren(root);
+}
+function createRootChildren(root: any) {
+ return root.codegenNode = root.children[0];
 }
 
 function createTransformContext(root: any, options: any) {
