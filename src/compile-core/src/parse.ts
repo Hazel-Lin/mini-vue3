@@ -165,6 +165,7 @@ function advanceBy(context: any, length: number) {
 function createRoot(children) {
   return {
     children,
+    type: NodeTypes.ROOT
   };
 }
 // <div><span></div> 只要在数组中找到和结束标签相同的标签就结束 并且报错

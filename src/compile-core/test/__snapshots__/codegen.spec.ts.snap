@@ -1,3 +1,8 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
+exports[`codegen interpolation 1`] = `
+"return function render(_ctx, _cache) {return '[object Object]'}
+return "
+`;
+
 exports[`codegen string 1`] = `"return function render(_ctx, _cache) {return 'hi'}"`;
