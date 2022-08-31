@@ -5,13 +5,12 @@ export const generate = (ast: any) => {
   console.log(ast,'ast')
   // 生成string
   // let code = ''
+  //  抽取代码
   let result = genContext()
   const { push } = result
   // const helper = ["toDisplayString"]
-  const aliasHelps = (s) => `${s}: _${s}`
-  const _Vue = "Vue"
-  push(`const { ${ast.helpers.map(aliasHelps).join(', ')} } = ${_Vue}`)
-  push("\n")
+  genFunctionPreamble(ast,result)
+ 
   let functionName = 'render'
   let p = ['_ctx','_cache']
   const signature = p.join(", ");
@@ -27,6 +26,13 @@ export const generate = (ast: any) => {
   return {
     code: result.code
   }
+}
+function genFunctionPreamble(ast,result){
+  const { push } = result
+  const aliasHelps = (s) => `${s}: _${s}`
+  const _Vue = "Vue"
+  push(`const { ${ast.helpers.map(aliasHelps).join(', ')} } = ${_Vue}`)
+  push("\n")
 }
 function genNode(ast){
   let res = ast.codegenNode
