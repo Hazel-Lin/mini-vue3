@@ -9,7 +9,7 @@ export const transform = (root, options={}) => {
   traverseNode(root, context);
   createRootChildren(root);
 
-  root.helpers = Array.from(context.helpers.keys());
+  root.helpers =  [...context.helpers.keys()];
 }
 function createRootChildren(root: any) {
  return root.codegenNode = root.children[0];
@@ -28,9 +28,9 @@ function createTransformContext(root: any, options: any) {
   return context;
 }
 function traverseNode(node: any, context: any) {
-  console.log('node',node);
 
   const nodeTransforms = context.nodeTransforms;
+
   for (let i = 0; i < nodeTransforms.length; i++) {
     const transform = nodeTransforms[i];
     // 递归调用transform函数
@@ -48,7 +48,6 @@ function traverseNode(node: any, context: any) {
     default:
       break;
   }
-  traverseChildren(node, context);
 }
 function traverseChildren(node: any, context: any) {
   const children = node.children;
