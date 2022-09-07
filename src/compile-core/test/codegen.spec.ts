@@ -18,4 +18,13 @@ describe("codegen", () => {
     const { code } = generate(ast);
     expect(code).toMatchSnapshot();
   });
+  it("element", () => {
+    const ast: any = baseParse("<div></div>");
+    transform(ast, {
+      nodeTransforms: [],
+    });
+
+    const { code } = generate(ast);
+    expect(code).toMatchSnapshot();
+  });
 });
