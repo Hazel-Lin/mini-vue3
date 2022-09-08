@@ -1,5 +1,7 @@
+import { isString } from "../../shared";
 import { NodeTypes } from "./ast";
-import { helperMapName, TO_DISPLAY_STRING } from "./runtimeHelpers";
+import { CREATE_ELEMENT_VNODE, helperMapName, TO_DISPLAY_STRING } from "./runtimeHelpers";
+
 export const generate = (ast: any) => {
   // { children: [ { type: 3, content: 'hi' } ] } 
   console.log(ast,'ast')
@@ -30,7 +32,7 @@ export const generate = (ast: any) => {
 }
 function genFunctionPreamble(ast,result){
   const { push } = result
-  const aliasHelps = (s) => `${s}: _${s}`
+  const aliasHelps = (s) => `${helperMapName[s]}:_${helperMapName[s]}`
   const _Vue = "Vue"
   if (ast.helpers.length > 0) {
     push(`const { ${ast.helpers.map(aliasHelps).join(', ')} } = ${_Vue}`)
@@ -50,16 +52,37 @@ switch (node.type) {
     case NodeTypes.SIMPLE_EXPRESSION:
       genExpression(node, context);
       break;
+    case NodeTypes.ELEMENT:
+      genElement(node, context);
+      break;
+    case NodeTypes.COMPOUND_EXPRESSION:
+      genCompoundExpression(node, context);
   default:
     break;
 }
   
+}
+function genElement(node: any, context: any) {
+  const { push,helper } = context
+  const { tag, props, children} = node
+  console.log(props,'props')
+  console.log(children,'children')
+  push(`${helper(CREATE_ELEMENT_VNODE)}("${tag}", null,`)
+  genNode(children, context);
+  // for (let i = 0; i < children.length; i++) {
+  //   const child = children[i];
+  //   genNode(child, context);
+  // }
+  push(`)`)
 }
 function genContext (){
   const context = {
     code: '',
     push(source){
       context.code += source
+    },
+    helper(key){
+      return `_${helperMapName[key]}`
     }
   }
   return context
@@ -74,5 +97,19 @@ function genInterpolation(node: any, context: any) {
 function genExpression(node: any, context: any) {
   const { push } = context
   push(`${node.content}`)
+}
+
+function genCompoundExpression(node: any, context: any) {
+  const { children} = node
+  const { push } = context
+
+  for (let i = 0; i < children.length; i++) {
+    const child = children[i];
+    if(isString(child)){
+      push(child)
+    }else{
+      genNode(child, context);
+    }
+  }
 }
 
