@@ -6,7 +6,7 @@ export const transformElement = function(node,context){
       return () => {
         context.helper(CREATE_ELEMENT_VNODE)
         const { props,tag,children } = node;
-        const vnodeTag = tag;
+        const vnodeTag = `"${tag}"`;
         const vnodeProps = props;
         let vnodeChildren = children[0];
         const vnodeElement = {
