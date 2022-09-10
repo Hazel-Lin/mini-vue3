@@ -90,8 +90,8 @@ function genContext (){
 }
 
 function genInterpolation(node: any, context: any) {
-  const { push } = context
-  push(`_toDisplayString(`)
+  const { push,helper } = context
+  push(`${helper(TO_DISPLAY_STRING)}(`);
   genNode(node.content, context);
   push(`)`)
 }
