@@ -1,9 +1,8 @@
 import { NodeTypes } from "../ast";
+import { isText } from "../utils";
 
-export const transformText = function(node,context){
-    function isText (node){
-      return node.type === NodeTypes.TEXT || node.type === NodeTypes.INTERPOLATION
-    }
+export const transformText = function(node){
+   
     let currentContainer;
     if(node.type === NodeTypes.ELEMENT){
       return () =>{

@@ -1,6 +1,7 @@
 // 1. 找到对应节点  深度优先
 
 import { NodeTypes } from "./ast";
+import { TO_DISPLAY_STRING } from "./runtimeHelpers";
 // 2. 修改节点内容
 export const transform = (root, options={}) => {
   console.log('transform',root);
@@ -44,7 +45,7 @@ function traverseNode(node: any, context: any) {
   }
   switch (node.type) {
     case NodeTypes.INTERPOLATION:
-      context.helper("toDisplayString");
+      context.helper(TO_DISPLAY_STRING);
       break;
     case NodeTypes.ROOT:
     case NodeTypes.ELEMENT:

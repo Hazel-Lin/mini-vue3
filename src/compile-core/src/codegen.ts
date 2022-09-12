@@ -32,7 +32,7 @@ export const generate = (ast: any) => {
 }
 function genFunctionPreamble(ast,result){
   const { push } = result
-  const aliasHelps = (s) => `${helperMapName[s]}:_${helperMapName[s]}`
+  const aliasHelps = (s) => `${helperMapName[s]}: _${helperMapName[s]}`
   const _Vue = "Vue"
   if (ast.helpers.length > 0) {
     push(`const { ${ast.helpers.map(aliasHelps).join(', ')} } = ${_Vue}`)
