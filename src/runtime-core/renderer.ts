@@ -323,7 +323,7 @@ export function createRenderer(options){
         console.log('初始化')
         // 调用时绑定到代理对象上
         const { proxy } = instance;
-        var subTree = instance.subTree = instance.render.call(proxy);
+        var subTree = instance.subTree = instance.render.call(proxy, proxy);
         patch(null,subTree, container,instance,anchor);
         // 根节点的el  赋值给组件的虚拟节点上
         vnode.el = subTree.el;
@@ -337,7 +337,7 @@ export function createRenderer(options){
           next.el = vnode.el;
           updateComponentPreRender(instance, next);
         }
-        var subTree = instance.render.call(proxy);
+        var subTree = instance.render.call(proxy, proxy);
         // 获取旧值
         var prevSubTree = instance.subTree;
         // 更新旧值
