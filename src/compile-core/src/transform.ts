@@ -1,6 +1,7 @@
 // 1. 找到对应节点  深度优先
 
 import { NodeTypes } from "./ast";
+import { TO_DISPLAY_STRING } from "./runtimeHelpers";
 // 2. 修改节点内容
 export const transform = (root, options={}) => {
   console.log('transform',root);
@@ -12,7 +13,12 @@ export const transform = (root, options={}) => {
   root.helpers =  [...context.helpers.keys()];
 }
 function createRootChildren(root: any) {
- return root.codegenNode = root.children[0];
+  const child = root.children[0];
+  if(child.type === NodeTypes.ELEMENT){
+    root.codegenNode = child.codegenNode;
+  }else{
+    root.codegenNode = root.children[0];
+  }
 }
 
 function createTransformContext(root: any, options: any) {
@@ -30,15 +36,16 @@ function createTransformContext(root: any, options: any) {
 function traverseNode(node: any, context: any) {
 
   const nodeTransforms = context.nodeTransforms;
-
+  const exitFns:any = []
   for (let i = 0; i < nodeTransforms.length; i++) {
     const transform = nodeTransforms[i];
     // 递归调用transform函数
-    transform(node);
+    const onExit = transform(node,context);
+    onExit && exitFns.push(onExit);
   }
   switch (node.type) {
     case NodeTypes.INTERPOLATION:
-      context.helper("toDisplayString");
+      context.helper(TO_DISPLAY_STRING);
       break;
     case NodeTypes.ROOT:
     case NodeTypes.ELEMENT:
@@ -47,6 +54,10 @@ function traverseNode(node: any, context: any) {
 
     default:
       break;
+  }
+  let i = exitFns.length;
+  while (i--) {
+    exitFns[i]();
   }
 }
 function traverseChildren(node: any, context: any) {
