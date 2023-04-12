@@ -1,2 +1,3 @@
-## Vue-lite
-深入学习Vue3的实现原理
+# Vue-lite
+
+通过实现一个 mini-vue 来深入学习 Vue3 的实现原理
