@@ -1,5 +1,5 @@
 {
-  "name": "Vue-thin",
+  "name": "hazel-mini-vue",
   "version": "1.0.0",
   "main": "lib/vue-thin.cjs.js",
   "module": "lib/vue-thin.esm.js",
@@ -11,6 +11,7 @@
     "build": "rollup -c rollup.config.js"
   },
   "devDependencies": {
+    "@antfu/eslint-config": "^0.39.5",
     "@babel/core": "^7.18.5",
     "@babel/preset-env": "^7.18.2",
     "@babel/preset-typescript": "^7.17.12",
