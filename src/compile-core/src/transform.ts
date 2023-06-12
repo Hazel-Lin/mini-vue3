@@ -1,5 +1,4 @@
 // 1. 找到对应节点  深度优先
-
 import { NodeTypes } from "./ast";
 import { TO_DISPLAY_STRING } from "./runtimeHelpers";
 // 2. 修改节点内容
@@ -8,11 +7,12 @@ export const transform = (root, options={}) => {
   const context:any = createTransformContext(root, options);
   console.log('context',context);
   traverseNode(root, context);
-  createRootChildren(root);
+  createRootCodegen(root);
 
-  root.helpers =  [...context.helpers.keys()];
+  root.helpers = new Set([...context.helpers.keys()])
+  
 }
-function createRootChildren(root: any) {
+function createRootCodegen(root: any) {
   const child = root.children[0];
   if(child.type === NodeTypes.ELEMENT){
     root.codegenNode = child.codegenNode;

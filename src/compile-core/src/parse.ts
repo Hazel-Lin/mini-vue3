@@ -147,6 +147,7 @@ function parseInterpolation(context) {
   // console.log('context.source',context.source);
     //  context.source =  message }}
   const rawContent = context.source.slice(0, rawContentLength);
+  // const rawContent = context.source.slice(sl,closeIndex)
   const content = rawContent.trim()
   // 插值取值完成后 删除插值的内容
   advanceBy(context, rawContentLength + end.length);
