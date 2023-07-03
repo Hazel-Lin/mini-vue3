@@ -11,6 +11,7 @@ const enum TagType {
 // children[0]是一个对象 包含type和content属性
 export const baseParse = (content) =>{
   const context = createParserContext(content)
+  // 将这些子节点作为根节点的children
   return createRoot(parseChildren(context,[]));
 }
 // 将内容放置在source中
@@ -137,6 +138,9 @@ function parseInterpolation(context) {
     end,
     sl
   );
+  if (closeIndex < 0) {
+    console.error('插值缺少结束定界符')
+  }
   // 11 获取到结束括号 }} 开始的位置
   // console.log('closeIndex',closeIndex);
   // console.log('context',context);

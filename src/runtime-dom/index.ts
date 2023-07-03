@@ -39,7 +39,9 @@ const renderer: any = createRenderer({
   remove,
   setElementText
 });
-
+function ensureRenderer() {
+  return  renderer || (renderer = createRenderer)
+}
 export function createApp(...args) {
   return renderer.createApp(...args);
 }
