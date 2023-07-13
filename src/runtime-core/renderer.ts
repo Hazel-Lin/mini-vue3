@@ -148,6 +148,7 @@ export function createRenderer(options){
     })
   }
   // 新旧节点做diff算法 对比是否相等
+  // c1 是旧的子节点数组，c2 是新的子节点数组。根据节点的key 和 type进行比较更新
   function patchKeyedChildren(
     c1,
     c2,
@@ -155,15 +156,15 @@ export function createRenderer(options){
     parentComponent,
     parentAnchor
   ) {
-    const l2 = c2.length;
     let i = 0;
+    const l2 = c2.length;
     let e1 = c1.length - 1;
     let e2 = l2 - 1;
 
     function isSomeVNodeType(n1, n2) {
       return n1.type === n2.type && n1.key === n2.key;
     }
-    // 左侧
+    // 从头部节点开始遍历
     while (i <= e1 && i <= e2) {
       const n1 = c1[i];
       const n2 = c2[i];
@@ -176,7 +177,7 @@ export function createRenderer(options){
 
       i++;
     }
-    // 右侧
+    // 从尾部节点开始遍历
     while (i <= e1 && i <= e2) {
       const n1 = c1[e1];
       const n2 = c2[e2];
@@ -193,7 +194,7 @@ export function createRenderer(options){
     if (i > e1) {
       if (i <= e2) {
         const nextPos = e2 + 1;
-        const anchor = nextPos < l2 ? c2[nextPos].el : null;
+        const anchor = nextPos < l2 ? c2[nextPos].el : parentAnchor;
 
         while (i <= e2) {
           patch(null, c2[i], container, parentComponent, anchor);
@@ -233,7 +234,7 @@ export function createRenderer(options){
         }
 
         let newIndex;
-        if (prevChild.key != null) {
+        if (prevChild.key !== null) {
           newIndex = keyToNewIndexMap.get(prevChild.key);
         } else {
           for (let j = s2; j < e2; j++) {
@@ -248,12 +249,12 @@ export function createRenderer(options){
         if (newIndex === undefined) {
           hostRemove(prevChild.el);
         } else {
+          newIndexToOldIndexMap[newIndex - s2] = i + 1;
           if (newIndex >= maxNewIndexSoFar) {
             maxNewIndexSoFar = newIndex;
           } else {
             moved = true;
           }
-          newIndexToOldIndexMap[newIndex - s2] = i + 1;
           patch(prevChild, c2[newIndex], container, parentComponent, null);
           patched++;
         }
