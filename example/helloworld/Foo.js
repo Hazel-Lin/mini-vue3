@@ -1,13 +1,12 @@
-import { h } from "../../lib/vue-thin.esm.js";
+import { h } from '../../lib/vue-thin.esm.js'
 
 export const Foo = {
   setup(props) {
     // props.count
     props.count++
-    console.log(props);
-
+    console.log(props)
   },
   render() {
-    return h("div", {}, "foo: " + this.count);
+    return h('div', {}, `foo: ${this.count}`)
   },
-};
+}

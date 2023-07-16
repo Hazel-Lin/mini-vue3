@@ -1,82 +1,118 @@
-import { h, ref } from "../../lib/vue-thin.esm.js";
+import { h, ref } from '../../lib/vue-thin.esm.js'
+
+// export const App = {
+//   name: "App",
+
+//   setup() {
+//     const count = ref(0);
+
+//     const onClick = () => {
+//       count.value++;
+//     };
+//     const props = ref({
+//       foo: "foo",
+//       bar: "bar",
+//     });
+//     const onChangePropsDemo1 = () => {
+//       props.value.foo = "new-foo";
+//     };
+
+//     const onChangePropsDemo2 = () => {
+//       props.value.foo = undefined;
+//     };
+
+//     const onChangePropsDemo3 = () => {
+//       props.value = {
+//         foo: "foo",
+//       };
+//     };
+
+//     return {
+//       count,
+//       onClick,
+//       onChangePropsDemo1,
+//       onChangePropsDemo2,
+//       onChangePropsDemo3,
+//       props,
+//     };
+//   },
+//   render() {
+//     console.log(this.count)
+//     return h(
+//       "div",
+//       {
+//         id: "root",
+//         ...this.props,
+//       },
+//       [
+//         h("div", {}, "count:" + this.count),
+//         h(
+//           "button",
+//           {
+//             onClick: this.onClick,
+//           },
+//           "click"
+//         ),
+//         h(
+//           "button",
+//           {
+//             onClick: this.onChangePropsDemo1,
+//           },
+//           " 值改变了 - 修改"
+//         ),
+
+//         h(
+//           "button",
+//           {
+//             onClick: this.onChangePropsDemo2,
+//           },
+//           " 值变成了 undefined - 删除"
+//         ),
+
+//         h(
+//           "button",
+//           {
+//             onClick: this.onChangePropsDemo3,
+//           },
+//           " key 在新的里面没有了 - 删除"
+//         ),
+//       ]
+//     );
+//   },
+// };
 
 export const App = {
-  name: "App",
+  name: 'App',
 
   setup() {
-    const count = ref(0);
-
+    const count = ref(0)
     const onClick = () => {
-      count.value++;
-    };
-    const props = ref({
-      foo: "foo",
-      bar: "bar",
-    });
-    const onChangePropsDemo1 = () => {
-      props.value.foo = "new-foo";
-    };
-
-    const onChangePropsDemo2 = () => {
-      props.value.foo = undefined;
-    };
-
-    const onChangePropsDemo3 = () => {
-      props.value = {
-        foo: "foo",
-      };
-    };
+      count.value++
+    }
 
     return {
       count,
       onClick,
-      onChangePropsDemo1,
-      onChangePropsDemo2,
-      onChangePropsDemo3,
-      props,
-    };
+    }
   },
   render() {
     console.log(this.count)
     return h(
-      "div",
+      'div',
       {
-        id: "root",
+        id: 'root',
         ...this.props,
       },
       [
-        h("div", {}, "count:" + this.count),
+        h('div', {}, `count:${this.count}`),
         h(
-          "button",
+          'button',
           {
             onClick: this.onClick,
           },
-          "click"
+          'click',
         ),
-        h(
-          "button",
-          {
-            onClick: this.onChangePropsDemo1,
-          },
-          " 值改变了 - 修改"
-        ),
-
-        h(
-          "button",
-          {
-            onClick: this.onChangePropsDemo2,
-          },
-          " 值变成了 undefined - 删除"
-        ),
-
-        h(
-          "button",
-          {
-            onClick: this.onChangePropsDemo3,
-          },
-          " key 在新的里面没有了 - 删除"
-        ),
-      ]
-    );
+      ],
+    )
   },
-};
+}
