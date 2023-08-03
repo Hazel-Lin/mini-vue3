@@ -2,7 +2,7 @@ import { hasChanged, isObject } from '../shared'
 import { isTracking, trackEffect, triggerEffect } from './effect'
 import { reactive } from './reactive'
 
-class Ref {
+class RefImpl {
   private _value: any
   private _rawValue: any
   public deps
@@ -38,7 +38,7 @@ function convert(value) {
 }
 // ref 触发依赖收集
 export function ref(raw) {
-  return new Ref(raw)
+  return new RefImpl(raw)
 }
 // 检查值是否为一个 ref 对象
 export function isRef(ref) {

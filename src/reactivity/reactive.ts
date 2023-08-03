@@ -15,7 +15,7 @@
  *
 */
 import { 
-  createProxy,
+  createReactiveObject,
   reactiveHandler,
   readonlyHandler,
   shallowReadonlyHandler,
@@ -24,10 +24,10 @@ import {
 
 // raw为目标对象 需要代理的对象
 export function reactive(raw){
-  return createProxy(raw,reactiveHandler)
+  return createReactiveObject(raw,reactiveHandler)
 }
 export function readonly(raw){
-  return createProxy(raw,readonlyHandler)
+  return createReactiveObject(raw,readonlyHandler)
 }
 // 判断是否是响应式对象
 export function isReactive(Object){
@@ -38,7 +38,7 @@ export function isReadonly(Object){
 }
 // 判断是否是shallowReadonly对象 shallowReadonly内部嵌套的不是响应式对象
 export function shallowReadonly(raw){
-  return createProxy(raw,shallowReadonlyHandler)
+  return createReactiveObject(raw,shallowReadonlyHandler)
 }
 // 检查对象是否是由 reactive 或 readonly 创建的 proxy。
 export function isProxy(raw){

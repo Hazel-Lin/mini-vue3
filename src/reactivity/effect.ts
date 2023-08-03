@@ -2,7 +2,7 @@ import { extend } from '../shared'
 
 let activeEffect
 let shouldTrack = true
-const targetMap = new Map()
+const targetMap = new WeakMap()
 export class ReactiveEffect {
   private _handle: any = null
   public scheduler: Function | undefined
